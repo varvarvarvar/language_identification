@@ -8,7 +8,7 @@ import numpy as np
 
 from seed import freeze_seed
 from lstm import CharRNNClassifier
-from datagen import Dictionary, batch_generator, pool_generator, text2data
+from datagen import Dictionary, batch_generator, pool_generator, encode_texts, encode_labels
 from train import get_model, validate, train
 
 
@@ -40,21 +40,19 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     # Convert data
 
-    x_train_idx, y_train_idx = text2data(char_vocab, lang_vocab, x_train_full, y_train_full)
-    x_test_idx, y_test_idx = text2data(char_vocab, lang_vocab, x_test_full, y_test_full)
+    x_train_idx = encode_texts(char_vocab, x_train_full)
+    y_train_idx = encode_labels(lang_vocab, y_train_full)
+
+    x_test_idx = encode_texts(char_vocab, x_test_full)
+    y_test_idx = encode_labels(lang_vocab, y_test_full)
 
     print(y_train_idx[0], x_train_idx[0][:10])
 
     x_train, x_val, y_train, y_val = train_test_split(x_train_idx, y_train_idx, test_size=0.15)
-    
-    # x_test_idx = [np.array([char_vocab.token2idx[c] for c in line]) for line in x_test_full]
-    # y_test_idx = np.array([lang_vocab.token2idx[lang] for lang in y_test_full])
-    # print(y_train_idx[0], x_train_idx[0][:10])
 
     train_data = [(x, y) for x, y in zip(x_train, y_train)]
     val_data = [(x, y) for x, y in zip(x_val, y_val)]
     test_data = [(x, y) for x, y in zip(x_test_idx, y_test_idx)]
-
     print(x_train[0])
 
     # mlflow.log_metrics({

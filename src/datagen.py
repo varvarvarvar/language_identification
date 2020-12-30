@@ -95,18 +95,24 @@ def pool_generator(data, batch_size, token_size, shuffle=False):
                 yield b
 
 
-def text2data(char_vocab, lang_vocab, texts, labels=None):
+def encode_texts(char_vocab, texts):
     x_test_idx = [np.array([char_vocab.token2idx[c] if c in char_vocab.token2idx else char_vocab.unk_index for c in line]) for line in texts]
-    if not labels:
-        y_test_idx = [i for i, _ in enumerate(texts)]
-    else:
-        y_test_idx = np.array([lang_vocab.token2idx[lang] if lang in lang_vocab.token2idx else lang_vocab.unk_index for lang in labels])
-    return x_test_idx, y_test_idx
+    return x_test_idx
 
+def encode_labels(lang_vocab, labels):
+    y_test_idx = np.array([lang_vocab.token2idx[lang] if lang in lang_vocab.token2idx else lang_vocab.unk_index for lang in labels])
+    return y_test_idx
 
 def predict_on_text(texts, model, batch_size, token_size):
-    test_data = texts2data(texts)
-    index, labels = test(model, test_data, batch_size, token_size)
-    order = np.argsort(index)
+    # test_texts = ['Привет!', 'Hi!', 'Hola']
+    test_idxs = encode_texts(char_vocab, texts)
+    test_labels = [i for i in range(len(texts))]
+    data = [(x, y) for x, y in zip(test_idxs, test_labels)]
+    from train import predict_on_batch
+    true, pred = predict_on_batch(model, data, batch_size, token_size, device)
+    true, pred  = np.array(true), np.array(pred)
+        
+    order = np.argsort(true)
     labels = labels[order]
+    
     return labels
