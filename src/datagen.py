@@ -49,8 +49,9 @@ class Dictionary(object):
         lang_vocab = cls()
         unk_token = 'other'
         cls.unk_index = lang_vocab.add_token(unk_token)
-        for lang in target_languages:
-            lang_vocab.add_token(lang)
+        for lang in set(labels):
+            if lang in target_languages:
+                lang_vocab.add_token(lang)
         print(lang_vocab.idx2token)
         print("Labels:", len(lang_vocab), "languages")
         

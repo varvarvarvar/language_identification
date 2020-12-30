@@ -9,7 +9,7 @@ import numpy as np
 from seed import freeze_seed
 from lstm import CharRNNClassifier
 from datagen import Dictionary, batch_generator, pool_generator, text2data
-from train import get_model, test, validate, train
+from train import get_model, validate, train
 
 
 @click.command()
@@ -28,10 +28,10 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     x_test_full = open("../input/wili-2018/x_test.txt").read().splitlines()
     y_test_full = open("../input/wili-2018/y_test.txt").read().splitlines()
 
-    # x_train_full = x_train_full[:10]
-    # y_train_full = y_train_full[:10]
-    # x_test_full = x_test_full[:10]
-    # y_test_full = y_test_full[:10]
+    x_train_full = x_train_full[:10]
+    y_train_full = y_train_full[:10]
+    x_test_full = x_test_full[:10]
+    y_test_full = y_test_full[:10]
 
     # Get encoders
 
@@ -57,10 +57,10 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     print(x_train[0])
 
-    mlflow.log_metrics({
-        "train samples": len(train_data),
-        "val samples": len(val_data)
-        })
+    # mlflow.log_metrics({
+    #     "train samples": len(train_data),
+    #     "val samples": len(val_data)
+    #     })
 
     if not torch.cuda.is_available():
         print("WARNING: CUDA is not available. Select 'GPU On' on kernel settings")
@@ -78,21 +78,21 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     print(f'Training cross-validation model for {epochs} epochs')
     for epoch in range(epochs):
         train_acc = train(model, optimizer, train_data, batch_size, token_size, criterion, device)
-        print(f'| epoch {epoch:03d} | train accuracy={train_acc:.1f}%')
-        valid_acc = validate(model, val_data, batch_size, token_size, device)
-        test_acc = validate(model, test_data, batch_size, token_size, device)
-        print(f'| epoch {epoch:03d} | val accuracy={valid_acc:.1f}%')
+        # print(f'| epoch {epoch:03d} | train accuracy={train_acc:.1f}%')
+        validate(model, val_data, batch_size, token_size, device)
+        validate(model, test_data, batch_size, token_size, device)
+        # print(f'| epoch {epoch:03d} | val accuracy={valid_acc:.1f}%')
 
-        mlflow.log_metrics({
-            "train_acc": train_acc,
-            "val_acc": valid_acc,
-            "test_acc": test_acc
-            })
+        # mlflow.log_metrics({
+        #     "train_acc": train_acc,
+        #     "val_acc": valid_acc,
+        #     "test_acc": test_acc
+        #     })
 
-    print(model)
-    for name, param in model.named_parameters():
-        print(f'{name:20} {param.numel()} {list(param.shape)}')
-    print(f'TOTAL                {sum(p.numel() for p in model.parameters())}')
+    # print(model)
+    # for name, param in model.named_parameters():
+    #     print(f'{name:20} {param.numel()} {list(param.shape)}')
+    # print(f'TOTAL                {sum(p.numel() for p in model.parameters())}')
     
     # mlflow.pytorch.save_model(model, 'model')
 
