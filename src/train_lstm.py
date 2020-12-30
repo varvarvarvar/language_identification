@@ -72,21 +72,22 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     pad_index = char_vocab.pad_index
     
     model, optimizer = get_model(ntokens, embedding_size, hidden_size, nlabels, bidirectional, pad_index, device)
-    
-    print(f'Training cross-validation model for {epochs} epochs')
-    for epoch in range(epochs):
-        train_acc = train(model, optimizer, train_data, batch_size, token_size, criterion, device)
-        # print(f'| epoch {epoch:03d} | train accuracy={train_acc:.1f}%')
-        validate(model, val_data, batch_size, token_size, device)
-        validate(model, test_data, batch_size, token_size, device)
-        # print(f'| epoch {epoch:03d} | val accuracy={valid_acc:.1f}%')
+       
+    with mlflow.start_run():
+        print(f'Training cross-validation model for {epochs} epochs')
+        for epoch in range(epochs):
+            train_acc = train(model, optimizer, train_data, batch_size, token_size, criterion, device)
+            # print(f'| epoch {epoch:03d} | train accuracy={train_acc:.1f}%')
+            # validate(model, val_data, batch_size, token_size, device, lang_vocab, tag=f'{epoch} test')
+            validate(model, test_data, batch_size, token_size, device, lang_vocab, tag='test', epoch=epoch)
+            # print(f'| epoch {epoch:03d} | val accuracy={valid_acc:.1f}%')
 
-        # mlflow.log_metrics({
-        #     "train_acc": train_acc,
-        #     "val_acc": valid_acc,
-        #     "test_acc": test_acc
-        #     })
-
+            # mlflow.log_metrics({
+            #     "train_acc": train_acc,
+            #     "val_acc": valid_acc,
+            #     "test_acc": test_acc
+            #     })
+    # mlflow.log_artifact(cm, 'confusion matrix)
     # print(model)
     # for name, param in model.named_parameters():
     #     print(f'{name:20} {param.numel()} {list(param.shape)}')

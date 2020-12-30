@@ -48,12 +48,12 @@ def get_model(ntokens, embedding_size, hidden_size, nlabels, bidirectional, pad_
     return model, optimizer
 
 
-def validate(model, data, batch_size, token_size, device):
-    # calculate accuracy on validation set
+def validate(model, data, batch_size, token_size, device, lang_vocab, epoch, tag=''):
     true, pred = predict_on_batch(model, data, batch_size, token_size, device)
-    report = classification_report(true, pred, output_dict=True)
+    report = classification_report(true, pred, output_dict=True, target_names=lang_vocab.idx2token)
     report = flatten(report)
-    mlflow.log_metrics(report)
+    report = {' '.join((tag, metric)): value for metric, value in report.items()}
+    mlflow.log_metrics(report, step=epoch)
 
 
 def train(model, optimizer, data, batch_size, token_size, criterion, device):
