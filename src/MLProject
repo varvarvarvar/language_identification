@@ -1,7 +1,5 @@
 name: hyperparametertf
 
-docker_env:
-  image:  mlflow
 entry_points:
   main:
     parameters:

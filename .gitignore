@@ -1,6 +1,6 @@
-input
 mlruns
 __pycache__
 env
 *.ipynb
 .ipynb_checkpoints
+.DS_Store
