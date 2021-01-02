@@ -12,6 +12,19 @@ from datagen import Dictionary, batch_generator, pool_generator, encode_texts, e
 from train import get_model, validate, train
 
 
+# import os
+# from dotenv import load_dotenv
+
+# load_dotenv()
+# print(os.environ.get('MLFLOW_TRACKING_URI', None))
+# MLFLOW_TRACKING_URI = os.environ.get('MLFLOW_TRACKING_URI', None)
+# print(MLFLOW_TRACKING_URI)
+
+# mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+# print(MLFLOW_TRACKING_URI)
+# print( mlflow.get_tracking_uri())
+
+
 @click.command()
 @click.option("--epochs", type=click.INT, default=50, help="Number of train steps.")
 @click.option("--batch_size", type=click.INT, default=256, help="Number of train steps.")
@@ -73,7 +86,9 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     
     model, optimizer = get_model(ntokens, embedding_size, hidden_size, nlabels, bidirectional, pad_index, device)
        
+
     with mlflow.start_run():
+
         print(f'Training cross-validation model for {epochs} epochs')
         for epoch in range(epochs):
             train_acc = train(model, optimizer, train_data, batch_size, token_size, criterion, device)
@@ -92,7 +107,8 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     # for name, param in model.named_parameters():
     #     print(f'{name:20} {param.numel()} {list(param.shape)}')
     # print(f'TOTAL                {sum(p.numel() for p in model.parameters())}')
-    
+    mlflow.pytorch.log_model(model, 'model')
+
     # mlflow.pytorch.save_model(model, 'model')
 
 if __name__ == '__main__':

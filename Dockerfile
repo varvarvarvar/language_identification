@@ -4,7 +4,7 @@ ENV MLFLOW_HOME /opt/mlflow
 ENV SERVER_PORT 5000
 ENV SERVER_HOST 0.0.0.0
 # ENV FILE_STORE ${MLFLOW_HOME}/src/fileStore
-# ENV ARTIFACT_STORE ${MLFLOW_HOME}/src/artifactStore
+ENV ARTIFACT_STORE s3://aws-language-identification/artifacts
 
 RUN mkdir -p ${MLFLOW_HOME}/src
 # RUN mkdir -p ${MLFLOW_HOME}/src && \
@@ -22,7 +22,7 @@ EXPOSE ${SERVER_PORT}/tcp
 
 WORKDIR ${MLFLOW_HOME}
 
-# COPY .env ${MLFLOW_HOME}
+COPY .env ${MLFLOW_HOME}
 
 RUN pip3 install -r requirements.txt
 
