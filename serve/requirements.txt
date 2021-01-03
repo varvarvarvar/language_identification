@@ -1,0 +1,2 @@
+torch-model-archiver==0.3.0
+torchserve==0.3.0
