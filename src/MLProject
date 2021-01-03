@@ -1,0 +1,16 @@
+name: hyperparametertf
+
+entry_points:
+  main:
+    parameters:
+      epochs: {type: int, default: 50}
+      batch_size: {type: int, default: 256}
+      token_size: {type: int, default: 200000}
+      hidden_size: {type: int, default: 256}
+      embedding_size: {type: int, default: 64}
+    command: "python train_lstm.py \
+                --epochs {epochs}
+                --batch_size {batch_size}
+                --token_size {token_size}
+                --hidden_size {hidden_size}
+                --embedding_size {embedding_size}"
