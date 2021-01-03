@@ -148,6 +148,6 @@ class Encoder():
         return x_train_idx, y_train_idx
 
     def encode_unlabeled_data(self, texts, char_vocab):
-        test_idxs = self.encode_texts(texts, char_vocab)
-        test_labels = [i for i in range(len(texts))]
-        return test_idxs, test_labels
+        x_idx = self.encode_texts(texts, char_vocab)
+        y_idx = [i for i in range(len(texts))]
+        return x_idx, y_idx
