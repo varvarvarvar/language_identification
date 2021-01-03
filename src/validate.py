@@ -93,9 +93,20 @@ class Predictor:
 
         return pred_labels
 
+    def postprocess(self, pred_labels):
+        mapper = {
+            'dan': 'Danish',
+            'swe': 'Swedish',
+            'nno': 'Nynorsk',
+            'nob': 'Bokmål',
+            'other': 'Other'
+        }
+        return [mapper[label] for label in pred_labels]
+
     def predict(self, texts):
         encoded = self.encode(texts)
-        pred_labels = self.predict_on_encoded(encoded, self.model, self.params)
+        pred_labels = self.predict_on_encoded(encoded)
+        pred_labels = self.postprocess(pred_labels)
         return pred_labels
 
 
