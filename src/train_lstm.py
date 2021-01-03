@@ -6,8 +6,9 @@ import click
 import logging
 
 from seed import freeze_seed
-from datagen import Dictionary, encode_texts, encode_labels
-from train import get_model, validate, train
+from datagen import Dictionary, Encoder
+from train import get_model, train
+from validate import validate
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -22,16 +23,16 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     # Read data
 
-    x_train_full = open("input/wili-2018/x_train.txt").read().splitlines()
-    y_train_full = open("input/wili-2018/y_train.txt").read().splitlines()
+    x_train_full = open("../input/wili-2018/x_train.txt").read().splitlines()
+    y_train_full = open("../input/wili-2018/y_train.txt").read().splitlines()
 
-    x_test_full = open("input/wili-2018/x_test.txt").read().splitlines()
-    y_test_full = open("input/wili-2018/y_test.txt").read().splitlines()
+    x_test_full = open("../input/wili-2018/x_test.txt").read().splitlines()
+    y_test_full = open("../input/wili-2018/y_test.txt").read().splitlines()
 
-    # x_train_full = x_train_full[:10]
-    # y_train_full = y_train_full[:10]
-    # x_test_full = x_test_full[:10]
-    # y_test_full = y_test_full[:10]
+    x_train_full = x_train_full[:100]
+    y_train_full = y_train_full[:100]
+    x_test_full = x_test_full[:100]
+    y_test_full = y_test_full[:100]
 
     # Get encoders
 
@@ -40,11 +41,8 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     # Convert data
 
-    x_train_idx = encode_texts(char_vocab, x_train_full)
-    y_train_idx = encode_labels(lang_vocab, y_train_full)
-
-    x_test_idx = encode_texts(char_vocab, x_test_full)
-    y_test_idx = encode_labels(lang_vocab, y_test_full)
+    x_train_idx, y_train_idx = Encoder().encode_labeled_data(x_train_full, y_train_full, char_vocab, lang_vocab)
+    x_test_idx, y_test_idx = Encoder().encode_labeled_data(x_test_full, y_test_full, char_vocab, lang_vocab)
 
     x_train, x_val, y_train, y_val = train_test_split(x_train_idx, y_train_idx, test_size=0.15)
 
@@ -74,6 +72,12 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
                 "test samples": len(test_data)
                 }
             )
+
+        mlflow.log_dict(lang_vocab.token2idx, "lang_vocab.json")
+        mlflow.log_dict(char_vocab.token2idx, "char_vocab.json")
+        params = {'epochs': epochs, 'batch_size': batch_size, 'token_size': token_size, 'hidden_size': hidden_size, 'embedding_size': embedding_size}
+        mlflow.log_dict(params, "params.json")
+
 
         logging.info(f'Training cross-validation model for {epochs} epochs')
         
