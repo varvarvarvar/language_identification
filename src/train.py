@@ -1,10 +1,15 @@
+import mlflow
 import torch
+from sklearn.metrics import classification_report
+
+import logging
+
+from collections import MutableMapping
+
 from lstm import CharRNNClassifier
 from datagen import pool_generator
-from sklearn.metrics import classification_report
-from collections import MutableMapping
-import numpy as np
-import mlflow
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 def flatten(d, parent_key='', sep='_'):
@@ -18,26 +23,24 @@ def flatten(d, parent_key='', sep='_'):
     return dict(items)
 
 
-
 def predict_on_batch(model, data, batch_size, token_size, device):
     true, pred = [], []
     
     model.eval()
 
-    # calculate accuracy on validation set
-
     with torch.no_grad():
         for batch in pool_generator(data, batch_size, token_size):
             # Get input and target sequences from batch
             X = [torch.from_numpy(d[0]) for d in batch]
-            X_lengths = torch.tensor([x.numel() for x in X], dtype=torch.long, device=device)
+            X_lengths = torch.tensor([x.numel() for x in X], dtype=torch.long, device='cpu')
             y = torch.tensor([d[1] for d in batch], dtype=torch.long, device=device)
             # Pad the input sequences to create a matrix
             X = torch.nn.utils.rnn.pad_sequence(X).to(device)
-            answer = model(X, X_lengths)
+            pred_probs = model(X, X_lengths)
+            pred_labels = torch.max(pred_probs, 1)[1]
             
-            true += y
-            pred += torch.max(answer, 1)[1]
+            true += list(y.cpu().detach().numpy())
+            pred += list(pred_labels.cpu().detach().numpy())
 
     return true, pred
 
@@ -53,6 +56,8 @@ def validate(model, data, batch_size, token_size, device, lang_vocab, epoch, tag
     report = classification_report(true, pred, output_dict=True, target_names=lang_vocab.idx2token)
     report = flatten(report)
     report = {' '.join((tag, metric)): value for metric, value in report.items()}
+
+    logging.info(f'| epoch {epoch:02d} | {str(report)}')
     mlflow.log_metrics(report, step=epoch)
 
 
@@ -65,7 +70,7 @@ def train(model, optimizer, data, batch_size, token_size, criterion, device):
         # Get input and target sequences from batch
         X = [torch.from_numpy(d[0]) for d in batch]
         X_lengths = [x.numel() for x in X]
-        X_lengths = torch.tensor(X_lengths, dtype=torch.long, device=device)
+        X_lengths = torch.tensor(X_lengths, dtype=torch.long, device='cpu')
         y = torch.tensor([d[1] for d in batch], dtype=torch.long, device=device)
         # Pad the input sequences to create a matrix
         X = torch.nn.utils.rnn.pad_sequence(X).to(device)

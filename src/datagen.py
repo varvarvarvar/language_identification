@@ -1,6 +1,11 @@
 import numpy as np
 import random
 
+import logging
+
+logging.getLogger().setLevel(logging.INFO)
+
+
 class Dictionary(object):
     def __init__(self):
         self.token2idx = {}
@@ -19,8 +24,8 @@ class Dictionary(object):
     def char_dict(cls, texts):
         char_vocab = cls()
         
-        pad_token = '<pad>' # reserve index 0 for padding
-        unk_token = '<unk>' # reserve index 1 for unknown token
+        pad_token = '<pad>'  # reserve index 0 for padding
+        unk_token = '<unk>'  # reserve index 1 for unknown token
         
         cls.pad_index = char_vocab.add_token(pad_token)
         cls.unk_index = char_vocab.add_token(unk_token)
@@ -28,23 +33,13 @@ class Dictionary(object):
         chars = set(''.join(texts))
         for char in sorted(chars):
             char_vocab.add_token(char)
-        print("Vocabulary:", len(char_vocab), "UTF characters")
+        
+        logging.info(f"Vocabulary: {len(char_vocab)} UTF characters")
         
         return char_vocab
 
-    # @classmethod
-    # def lang_dict(cls, labels):
-    #     # use python set to obtain the list of languages without repetitions
-    #     lang_vocab = cls()
-    #     languages = set(labels)
-    #     for lang in sorted(languages):
-    #         lang_vocab.add_token(lang)
-    #     print("Labels:", len(lang_vocab), "languages")
-        
-    #     return lang_vocab
-
     @classmethod
-    def lang_dict_scandi(cls, labels, target_languages=('dan', 'nor', 'swe', 'nno', 'nob')):
+    def lang_dict(cls, labels, target_languages=('dan', 'nor', 'swe', 'nno', 'nob')):
         # use python set to obtain the list of languages without repetitions
         lang_vocab = cls()
         unk_token = 'other'
@@ -52,8 +47,8 @@ class Dictionary(object):
         for lang in set(labels):
             if lang in target_languages:
                 lang_vocab.add_token(lang)
-        print(lang_vocab.idx2token)
-        print("Labels:", len(lang_vocab), "languages")
+
+        logging.info(f"Labels: {len(lang_vocab)} languages")
         
         return lang_vocab
 
