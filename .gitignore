@@ -1,6 +1,7 @@
 mlruns
 __pycache__
 input
+artifacts
 env
 .env
 *.model
