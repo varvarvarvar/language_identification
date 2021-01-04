@@ -60,4 +60,4 @@ def identify_language():
         "Text: '%s', response: '%s'" % (text, prediction['response'])
     )
     return jsonify(
-        {'response': prediction['response'][0], 'text': text})
+        {'response': prediction['response'][0], 'text': text}), 200
