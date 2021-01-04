@@ -104,10 +104,16 @@ class Predictor:
         return [mapper[label] for label in pred_labels]
 
     def predict(self, texts):
-        encoded = self.encode(texts)
-        pred_labels = self.predict_on_encoded(encoded)
-        pred_labels = self.postprocess(pred_labels)
-        return pred_labels
+        try:
+            encoded = self.encode(texts)
+            pred_labels = self.predict_on_encoded(encoded)
+            pred_labels = self.postprocess(pred_labels)
+            
+            return {'response': pred_labels}
+
+        except Exception as e:
+            logging.error(e)
+            return {'response': None, 'error': e}
 
 
 def flatten(d, parent_key='', sep='_'):
