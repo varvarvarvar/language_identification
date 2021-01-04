@@ -3,3 +3,5 @@ mlflow==1.13
 gunicorn==20.0.4
 torch==1.7.1
 scikit-learn==0.24.0
+awscli==1.18.208
+python-dotenv==0.14.0

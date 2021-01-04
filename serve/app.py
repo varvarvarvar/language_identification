@@ -5,18 +5,14 @@ import logging
 
 logging.getLogger().setLevel(logging.INFO)
 
-sys.path.append('../src')
+sys.path.append('src')
 from validate import Predictor
 
 app = Flask(__name__)
 
-char_vocab_path = '../artifacts/char_vocab.json'
-lang_vocab_path = '../artifacts/lang_vocab.json'
-model_path = '../artifacts/model'
-params_path = '../artifacts/params.json'
-
-predictor = Predictor(char_vocab_path, lang_vocab_path, params_path, model_path)
-
+predictor = Predictor.default_predictor()
+logging.info(predictor.keys())
+logging.info(type(predictor['response']))
 
 @app.route('/')
 def index():
@@ -30,6 +26,8 @@ def index():
 
 @app.route('/language_identification/api/v1.0/', methods=['GET'])
 def identify_language():
+
+    global predictor
 
     response = request.json
 
@@ -45,7 +43,21 @@ def identify_language():
         ), 200
 
     text = response['text']
-    prediction = predictor.predict([text])
+
+    # Reload predictor if no model was specified at startup
+    if 'error' in predictor:
+        predictor = Predictor.default_predictor()
+        if 'error' in predictor:
+            logging.info('Reloading model')
+            return jsonify(
+                {
+                    'response': None,
+                    'text': text,
+                    'error': predictor['error']
+                    }
+                ), 200
+
+    prediction = predictor['response'].predict([text])
 
     if 'error' in prediction:
         return jsonify(
@@ -54,10 +66,10 @@ def identify_language():
                 'text': text,
                 'error': prediction['error']
             }
-        ), 200
+            ), 200
 
     logging.info(
-        "Text: '%s', response: '%s'" % (text, prediction['response'])
+        "Text: '%s', response: '%s'" % (text, prediction['response'][0])
     )
     return jsonify(
         {'response': prediction['response'][0], 'text': text}), 200

@@ -9,6 +9,7 @@ from sklearn.metrics import classification_report
 import logging
 
 from datagen import Dictionary, Encoder, pool_generator
+from config import LOCAL_MODEL_STORAGE
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -114,6 +115,24 @@ class Predictor:
         except Exception as e:
             logging.error(e)
             return {'response': None, 'error': e}
+
+    @classmethod
+    def default_predictor(cls):
+
+        char_vocab_path = './%s/char_vocab.json' % LOCAL_MODEL_STORAGE
+        lang_vocab_path = './%s/lang_vocab.json' % LOCAL_MODEL_STORAGE
+        model_path = './%s/model' % LOCAL_MODEL_STORAGE
+        params_path = './%s/params.json' % LOCAL_MODEL_STORAGE
+
+        try:
+            predictor = cls(char_vocab_path, lang_vocab_path, params_path, model_path)
+        except:
+            error_msg = 'Model not found. Download model with serve/download_model.sh'
+            logging.warning(error_msg)
+            return {'response': None, 'error': error_msg}
+
+        logging.info('Loaded model')
+        return {'response': predictor}
 
 
 def flatten(d, parent_key='', sep='_'):
