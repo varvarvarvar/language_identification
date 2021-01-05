@@ -35,10 +35,10 @@ services:
     ports:
       - "8080:8080"
 
-  example-prometheus:
+  prometheus:
     image: prom/prometheus:latest
     restart: unless-stopped
-    container_name: example-prometheus
+    container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -46,13 +46,13 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
 
-  example-grafana:
+  grafana:
     image: grafana/grafana:latest
     restart: unless-stopped
     user: "472"
-    container_name: example-grafana
+    container_name: grafana
     depends_on:
-      - example-prometheus
+      - prometheus
     ports:
       - "3000:3000"
     volumes:
