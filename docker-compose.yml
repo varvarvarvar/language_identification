@@ -3,7 +3,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: src/Dockerfile
       args:
         - MLFLOW_HOME=${MLFLOW_HOME}
         - SERVER_PORT=${SERVER_PORT}
@@ -11,3 +11,13 @@ services:
         - ARTIFACT_STORE=${ARTIFACT_STORE}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  serve:
+    build:
+      context: .
+      dockerfile: serve/Dockerfile
+      args:
+          - MLFLOW_HOME=${MLFLOW_HOME}
+          - ARTIFACT_STORE=${ARTIFACT_STORE}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - LOCAL_MODEL_STORAGE=${LOCAL_MODEL_STORAGE}

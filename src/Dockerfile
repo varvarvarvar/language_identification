@@ -19,7 +19,6 @@ ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
 RUN mkdir -p ${MLFLOW_HOME}
 COPY src/requirements.txt ${MLFLOW_HOME}
 ADD src ${MLFLOW_HOME}/src
-ADD input ${MLFLOW_HOME}/input
 
 EXPOSE ${SERVER_PORT}/tcp
 
