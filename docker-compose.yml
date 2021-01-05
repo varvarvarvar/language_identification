@@ -20,7 +20,7 @@ services:
       - ./mlruns:/opt/mlflow/mlruns
       - ./input:/opt/mlflow/input
 
-  flask-api:
+  serve:
     build:
       context: .
       dockerfile: serve/Dockerfile
@@ -31,7 +31,7 @@ services:
           - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           - LOCAL_MODEL_STORAGE=${LOCAL_MODEL_STORAGE}
     restart: unless-stopped
-    container_name: flask-api
+    container_name: serve
     image: language_identification_serve
     ports:
       - "8080:8080"
