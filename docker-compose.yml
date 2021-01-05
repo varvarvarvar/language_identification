@@ -1,5 +1,7 @@
 version: "3.8"
+
 services:
+
   web:
     build:
       context: .
@@ -11,6 +13,13 @@ services:
         - ARTIFACT_STORE=${ARTIFACT_STORE}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    container_name: mlflow
+    ports:
+      - 5000:5000
+    volumes:
+      - ./mlruns:/opt/mlflow/mlruns
+      - ./input:/opt/mlflow/input
+
   serve:
     build:
       context: .
@@ -21,3 +30,6 @@ services:
           - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
           - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           - LOCAL_MODEL_STORAGE=${LOCAL_MODEL_STORAGE}
+    container_name: serve
+    ports:
+      - 8080:8080
