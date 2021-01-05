@@ -1,2 +1,8 @@
-torch-model-archiver==0.3.0
-torchserve==0.3.0
+Flask==1.1.2
+mlflow==1.13
+gunicorn==20.0.4
+torch==1.7.0+cu101
+scikit-learn==0.24.0
+python-dotenv==0.14.0
+prometheus-flask-exporter==0.18.1
+awscli==1.18.208

@@ -1,6 +1,12 @@
 mlruns
 __pycache__
+input
+artifacts
 env
+.env
+*.model
+*.json
+*.pth
 *.ipynb
 .ipynb_checkpoints
 .DS_Store

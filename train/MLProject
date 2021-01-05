@@ -1,4 +1,4 @@
-name: hyperparametertf
+name: lang_identification_lstm
 
 entry_points:
   main:
@@ -8,7 +8,7 @@ entry_points:
       token_size: {type: int, default: 200000}
       hidden_size: {type: int, default: 256}
       embedding_size: {type: int, default: 64}
-    command: "python train_lstm.py \
+    command: "python main.py \
                 --epochs {epochs}
                 --batch_size {batch_size}
                 --token_size {token_size}

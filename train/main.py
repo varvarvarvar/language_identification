@@ -14,11 +14,11 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 @click.command()
-@click.option("--epochs", type=click.INT, default=50, help="Number of train steps.")
-@click.option("--batch_size", type=click.INT, default=256, help="Number of train steps.")
-@click.option("--token_size", type=click.INT, default=200000, help="Number of train steps.")
-@click.option("--hidden_size", type=click.INT, default=256, help="Number of train steps.")
-@click.option("--embedding_size", type=click.INT, default=64, help="Number of train steps.")
+@click.option("--epochs", type=click.INT, default=50,)
+@click.option("--batch_size", type=click.INT, default=256)
+@click.option("--token_size", type=click.INT, default=200000)
+@click.option("--hidden_size", type=click.INT, default=256)
+@click.option("--embedding_size", type=click.INT, default=64)
 def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     # Read data
@@ -29,11 +29,6 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     x_test_full = open("../input/wili-2018/x_test.txt").read().splitlines()
     y_test_full = open("../input/wili-2018/y_test.txt").read().splitlines()
 
-    x_train_full = x_train_full[:100]
-    y_train_full = y_train_full[:100]
-    x_test_full = x_test_full[:100]
-    y_test_full = y_test_full[:100]
-
     # Get encoders
 
     char_vocab = Dictionary().char_dict(x_train_full)
@@ -41,8 +36,16 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
 
     # Convert data
 
-    x_train_idx, y_train_idx = Encoder().encode_labeled_data(x_train_full, y_train_full, char_vocab, lang_vocab)
-    x_test_idx, y_test_idx = Encoder().encode_labeled_data(x_test_full, y_test_full, char_vocab, lang_vocab)
+    x_train_idx, y_train_idx = Encoder().encode_labeled_data(
+        x_train_full,
+        y_train_full,
+        char_vocab,
+        lang_vocab)
+    x_test_idx, y_test_idx = Encoder().encode_labeled_data(
+        x_test_full,
+        y_test_full,
+        char_vocab,
+        lang_vocab)
 
     x_train, x_val, y_train, y_val = train_test_split(x_train_idx, y_train_idx, test_size=0.15)
 
@@ -53,18 +56,25 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if not torch.cuda.is_available():
         logging.warning("WARNING: CUDA is not available.")
-    
+
     criterion = torch.nn.CrossEntropyLoss(reduction='sum')
-    
+
     bidirectional = False
     ntokens = len(char_vocab)
     nlabels = len(lang_vocab)
     pad_index = char_vocab.pad_index
-    
-    model, optimizer = get_model(ntokens, embedding_size, hidden_size, nlabels, bidirectional, pad_index, device)
-       
+
+    model, optimizer = get_model(
+        ntokens,
+        embedding_size,
+        hidden_size,
+        nlabels,
+        bidirectional,
+        pad_index,
+        device)
+
     with mlflow.start_run():
-        
+
         mlflow.log_metrics(
             {
                 "train samples": len(train_data),
@@ -78,16 +88,15 @@ def train_epochs(epochs, batch_size, token_size, hidden_size, embedding_size):
         params = {'epochs': epochs, 'batch_size': batch_size, 'token_size': token_size, 'hidden_size': hidden_size, 'embedding_size': embedding_size}
         mlflow.log_dict(params, "params.json")
 
-
         logging.info(f'Training cross-validation model for {epochs} epochs')
-        
+
         for epoch in range(epochs):
             train_acc = train(model, optimizer, train_data, batch_size, token_size, criterion, device)
             logging.info(f'| epoch {epoch:02d} | train accuracy={train_acc:.1f}%')
-            
+
             validate(model, val_data, batch_size, token_size, device, lang_vocab, tag='val', epoch=epoch)
             validate(model, test_data, batch_size, token_size, device, lang_vocab, tag='test', epoch=epoch)
-            
+
             mlflow.pytorch.log_model(model, f'{epoch:02d}.model')
 
     mlflow.pytorch.log_model(model, 'model')

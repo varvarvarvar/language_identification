@@ -1,13 +1,61 @@
 version: "3.8"
+
 services:
-  web:
+
+  mlflow:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: train/Dockerfile
       args:
-        - MLFLOW_HOME=${MLFLOW_HOME}
-        - SERVER_PORT=${SERVER_PORT}
-        - SERVER_HOST=${SERVER_HOST}
+        - MLFLOW_HOST=${MLFLOW_HOST}
         - ARTIFACT_STORE=${ARTIFACT_STORE}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    restart: unless-stopped
+    container_name: mlflow
+    image: language_identification_mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/opt/mlflow/mlruns
+      - ./input:/opt/mlflow/input
+
+  serve:
+    build:
+      context: .
+      dockerfile: serve/Dockerfile
+      args:
+          - ARTIFACT_STORE=${ARTIFACT_STORE}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - LOCAL_MODEL_STORAGE=${LOCAL_MODEL_STORAGE}
+    restart: unless-stopped
+    container_name: serve
+    image: language_identification_serve
+    ports:
+      - "8080:8080"
+
+  example-prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    container_name: example-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  example-grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    user: "472"
+    container_name: example-grafana
+    depends_on:
+      - example-prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasource.yml
+    env_file:
+      - ./monitoring/config.monitoring
