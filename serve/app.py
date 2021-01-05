@@ -1,18 +1,20 @@
 import sys
 
 from flask import Flask, jsonify, request
-import logging
 
-logging.getLogger().setLevel(logging.INFO)
+import logging
+from prometheus_flask_exporter import PrometheusMetrics
 
 sys.path.append('src')
 from validate import Predictor
 
+logging.getLogger().setLevel(logging.INFO)
+
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 predictor = Predictor.default_predictor()
-logging.info(predictor.keys())
-logging.info(type(predictor['response']))
+
 
 @app.route('/')
 def index():
