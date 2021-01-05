@@ -2,18 +2,18 @@ version: "3.8"
 
 services:
 
-  web:
+  mlflow:
     build:
       context: .
       dockerfile: src/Dockerfile
       args:
-        - MLFLOW_HOME=${MLFLOW_HOME}
-        - SERVER_PORT=${SERVER_PORT}
-        - SERVER_HOST=${SERVER_HOST}
+        - MLFLOW_HOST=${MLFLOW_HOST}
         - ARTIFACT_STORE=${ARTIFACT_STORE}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    restart: unless-stopped
     container_name: mlflow
+    image: language_identification_mlflow
     ports:
       - 5000:5000
     volumes:
@@ -25,7 +25,6 @@ services:
       context: .
       dockerfile: serve/Dockerfile
       args:
-          - MLFLOW_HOME=${MLFLOW_HOME}
           - ARTIFACT_STORE=${ARTIFACT_STORE}
           - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
           - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
