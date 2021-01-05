@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.6.9
 
 ARG HOME=/opt/mlflow
 
@@ -19,14 +19,15 @@ ENV MLFLOW_TRACKING_URI $MLFLOW_TRACKING_URI
 RUN echo "${MLFLOW_TRACKING_URI}"
 
 RUN mkdir -p ${HOME}
-COPY src/requirements.txt ${HOME}
-ADD src ${HOME}/src
+COPY train/requirements.txt ${HOME}
+ADD train ${HOME}/train
 
 WORKDIR ${HOME}
 
 EXPOSE 5000
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html --default-timeout=1000
 
-RUN ["chmod", "+x", "./src/run.sh"]
-ENTRYPOINT ["./src/run.sh"]
+
+RUN chmod +x ./train/run.sh
+ENTRYPOINT ["./train/run.sh"]

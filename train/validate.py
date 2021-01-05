@@ -109,12 +109,12 @@ class Predictor:
             encoded = self.encode(texts)
             pred_labels = self.predict_on_encoded(encoded)
             pred_labels = self.postprocess(pred_labels)
-            
+
             return {'response': pred_labels}
 
         except Exception as e:
             logging.error(e)
-            return {'response': None, 'error': e}
+            return {'response': None, 'error': str(e)}
 
     @classmethod
     def default_predictor(cls):
@@ -126,10 +126,10 @@ class Predictor:
 
         try:
             predictor = cls(char_vocab_path, lang_vocab_path, params_path, model_path)
-        except:
-            error_msg = 'Model not found. Download model with serve/download_model.sh'
-            logging.warning(error_msg)
-            return {'response': None, 'error': error_msg}
+        except Exception as e:
+            logging.warning('Model not found. Download model with serve/download_model.sh')
+            logging.error(e)
+            return {'response': None, 'error': str(e)}
 
         logging.info('Loaded model')
         return {'response': predictor}

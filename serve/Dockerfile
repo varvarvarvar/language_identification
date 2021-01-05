@@ -16,17 +16,17 @@ ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
 ENV LOCAL_MODEL_STORAGE $LOCAL_MODEL_STORAGE
 
 RUN mkdir -p ${HOME}
-ADD src ${HOME}/src
+ADD train ${HOME}/train
 ADD serve ${HOME}/serve
-COPY src/requirements.txt ${HOME}
+COPY serve/requirements.txt ${HOME}
 
 WORKDIR ${HOME}
 
 EXPOSE 8080
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -U -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html --default-timeout=1000
 
-RUN ["chmod", "+x", "serve/download_model.sh"]
+RUN chmod +x serve/download_model.sh
 
 ENTRYPOINT ["python3"]
-CMD ["serve/main.py"]
+CMD ["./serve/main.py"]

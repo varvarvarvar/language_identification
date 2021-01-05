@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 import logging
 from prometheus_flask_exporter import PrometheusMetrics
 
-sys.path.append('src')
+sys.path.append('train')
 from validate import Predictor
 
 logging.getLogger().setLevel(logging.INFO)

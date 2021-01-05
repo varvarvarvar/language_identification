@@ -5,7 +5,7 @@ services:
   mlflow:
     build:
       context: .
-      dockerfile: src/Dockerfile
+      dockerfile: train/Dockerfile
       args:
         - MLFLOW_HOST=${MLFLOW_HOST}
         - ARTIFACT_STORE=${ARTIFACT_STORE}
@@ -15,7 +15,7 @@ services:
     container_name: mlflow
     image: language_identification_mlflow
     ports:
-      - 5000:5000
+      - "5000:5000"
     volumes:
       - ./mlruns:/opt/mlflow/mlruns
       - ./input:/opt/mlflow/input
@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
     container_name: example-prometheus
     ports:
-      - 9090:9090
+      - "9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
@@ -54,7 +54,7 @@ services:
     depends_on:
       - example-prometheus
     ports:
-      - 3000:3000
+      - "3000:3000"
     volumes:
       - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasource.yml
     env_file:
