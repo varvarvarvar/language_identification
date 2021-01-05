@@ -61,7 +61,8 @@ $ curl -i -H "Content-Type: application/json" -X GET -d '{"text": "Savannen ligg
 
 >> {
   "response":"Danish",
-  "text":"Savannen ligger i tropiske og subtropiske områder. Der vokser oftest enkeltstående buske og træer på savannen. Er der mange træer, kalder man det for en skovsavanne. I Afrika er der meget savanne, faktisk dækker savannen næsten halvdelen af Afrika, men der er også store savanner i Australien, Sydamerika og Indien."}
+  "text":"Savannen ligger i tropiske og subtropiske områder. Der vokser oftest enkeltstående buske og træer på savannen. Er der mange træer, kalder man det for en skovsavanne. I Afrika er der meget savanne, faktisk dækker savannen næsten halvdelen af Afrika, men der er også store savanner i Australien, Sydamerika og Indien."
+   }
 
 ```
 
@@ -71,7 +72,7 @@ $ curl -i -H "Content-Type: application/json" -X GET -d '{"text": "Саванн�
 >> {
   "response": "Other", 
   "text": "Саванны — климатические регионы, свойственные более возвышенным тропическим странам с сухим континентальным климатом. В отличие от настоящих степей, саванны, кроме трав, содержат также кустарники и деревья, растущие иногда целым лесом, как, например, в Бразилии."
-  }
+   }
 ```
 
 6. Monitor with Prometheus, Grafana.
