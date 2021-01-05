@@ -35,9 +35,6 @@ services:
     image: language_identification_serve
     ports:
       - "8080:8080"
-    networks:
-      example-network:
-        ipv4_address: 172.16.238.10
 
   example-prometheus:
     image: prom/prometheus:latest
@@ -49,9 +46,6 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    networks:
-      example-network:
-        ipv4_address: 172.16.238.11
 
   example-grafana:
     image: grafana/grafana:latest
@@ -66,15 +60,3 @@ services:
       - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasource.yml
     env_file:
       - ./monitoring/config.monitoring
-    networks:
-      example-network:
-        ipv4_address: 172.16.238.12
-
-networks:
-  example-network:
-    name: example-network
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.16.238.0/24
